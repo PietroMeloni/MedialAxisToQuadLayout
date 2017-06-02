@@ -1,0 +1,15 @@
+[submodule "dcel"]
+	path = dcel
+	url = https://github.com/muntonialessandro/Dcel-Module.git
+[submodule "common"]
+	path = common
+	url = https://github.com/muntonialessandro/Common-Module.git
+[submodule "cgal"]
+	path = cgal
+	url = https://github.com/muntonialessandro/CGAL-Module.git
+[submodule "viewer"]
+	path = viewer
+	url = https://github.com/muntonialessandro/Viewer-Module.git
+[submodule "eigenmesh"]
+	path = eigenmesh
+	url = https://github.com/muntonialessandro/EigenMesh-Module.git

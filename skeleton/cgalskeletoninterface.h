@@ -26,11 +26,18 @@ typedef boost::graph_traits<Meso_skeleton>::vertex_descriptor    Meso_Vertex;
 typedef boost::graph_traits<Meso_skeleton>::edge_descriptor      Meso_Edge;
 typedef boost::graph_traits<Meso_skeleton>::edge_iterator        Meso_Iterator;
 
+struct skelComponents {
+    std::list<std::pair<Pointd, Pointd> > listaEdge;
+    std::vector<int> listaTriangoli;
+    std::vector<double> listaPunti;
+};
+
 namespace CgalSkeletonInterface
 {
 
-    std::list<std::pair<Pointd, Pointd>> computeSkeleton(const char* input);
-    std::list<std::pair<Pointd, Pointd>> computeMesoSkeleton(const char* input);
+    skelComponents computeSkeleton(const char* input);
+
+    //std::list<std::pair<Pointd, Pointd> > computeMesoSkeleton(const char* input);
 
 }
 

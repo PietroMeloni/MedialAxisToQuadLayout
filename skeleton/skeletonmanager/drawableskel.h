@@ -6,7 +6,13 @@
 #include "viewer/objects/objects.h"
 #include <QColor>
 #include "viewer/mainwindow.h"
+#include "cgalskeletoninterface.h"
 
+struct skelComponents {
+    std::list<std::pair<Pointd, Pointd> > listaEdge;
+    std::vector<int> listaTriangoli;
+    std::vector<double> listaPunti;
+};
 
 class DrawableSkel : public DrawableObject
 {

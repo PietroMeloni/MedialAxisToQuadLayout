@@ -3,20 +3,17 @@
 DrawableSkel::DrawableSkel()
 {
 
-        //edge_list = CgalSkeletonInterface::computeSkeleton(filename.toStdString().c_str());
-
-
 }
 
 DrawableSkel::DrawableSkel(const char *file_name)
 {
-    edge_list = CgalSkeletonInterface::computeSkeleton(file_name);
+    skelComponents temp = CgalSkeletonInterface::computeSkeleton(file_name);
+    edge_list = temp.listaEdge;
 }
 
 DrawableSkel::DrawableSkel(const Skel *skel)
 {
     skeleton = skel;
-   // edge_list = CgalSkeletonInterface::computeSkeleton();
 
 }
 
