@@ -1,20 +1,18 @@
 #ifndef DRAWABLESKEL_H
 #define DRAWABLESKEL_H
 
+#include <math.h>
 #include "viewer/interfaces/drawable_object.h"
+#include "viewer/interfaces/drawable_mesh.h"
 #include "skel.h"
 #include "viewer/objects/objects.h"
 #include <QColor>
 #include "viewer/mainwindow.h"
-#include "cgalskeletoninterface.h"
+#include "skeleton/skeletoncreator.h"
+#include "trimesh/trimesh.h"
 
-struct skelComponents {
-    std::list<std::pair<Pointd, Pointd> > listaEdge;
-    std::vector<int> listaTriangoli;
-    std::vector<double> listaPunti;
-};
-
-class DrawableSkel : public DrawableObject
+class DrawableSkel : public DrawableMesh,
+                     public Trimesh<double>
 {
     public:
         DrawableSkel();
@@ -29,6 +27,7 @@ class DrawableSkel : public DrawableObject
         double sceneRadius() const ;
 
         bool isVisible() const;
+        void init();
 
 
 
@@ -41,9 +40,9 @@ class DrawableSkel : public DrawableObject
         DrawableTrimesh* trimesh;
         DrawableSkel* dsk;
 
+
         void setEdgeList(std::list<std::pair<Pointd, Pointd>> edges);
-
-
+        static bool isTrisOnBorder(Pointd a, Pointd b, Pointd c);
 
 };
 
