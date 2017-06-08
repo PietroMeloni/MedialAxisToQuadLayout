@@ -12,6 +12,9 @@ DrawableSkel::DrawableSkel(const char *file_name)
     edge_list = skelCreator.getListaEdge();
     tris = skelCreator.getListaTriangoli();
     coords = skelCreator.getListaPunti();
+    buildAdjacency();
+    updateNormals();
+    updateBbox();
 
 }
 
@@ -37,16 +40,18 @@ void DrawableSkel::init()
 
 double DrawableSkel::sceneRadius() const
 {
-    return 0.0;
+    return bbox.diag();
 }
 
 Pointd DrawableSkel::sceneCenter() const
 {
-    return Pointd(0,0,0);
+    Pointd c = bbox.center();
+    return Pointd(c.x(), c.y(), c.z());
 }
 
 void DrawableSkel::draw() const
 {
+    int i = 0;
     QList<Pointd> temp;
     glDisable(GL_LIGHTING);
     glShadeModel(GL_FLAT);
@@ -76,28 +81,36 @@ void DrawableSkel::draw() const
         int vid0_ptr = 3 * vid0;
         int vid1_ptr = 3 * vid1;
         int vid2_ptr = 3 * vid2;
-        if(isTrisOnBorder(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
+        if(isTrisOnBorder2(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
                           Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
                           Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2])))
         {
             glBegin(GL_TRIANGLES);
 
             glColor3f(1.0, 0.0, 0.0);
+            qDebug()<< "tri2tri[ "<<tid <<"] = "<< tri2tri[tid] << "\n" ;
+            i++;
         }
         else
         {
             glBegin(GL_TRIANGLES);
             glColor3f(0.1, 0.8, 0.1);
         }
-        //glNormal3dv(&(triangleNormals[tid_ptr]));
+        glNormal3dv(&(triangleNormals[tid_ptr]));
         glVertex3dv(&(coords[vid0_ptr]));
-        //glNormal3dv(&(triangleNormals[tid_ptr]));
+        glNormal3dv(&(triangleNormals[tid_ptr]));
         glVertex3dv(&(coords[vid1_ptr]));
-        //glNormal3dv(&(triangleNormals[tid_ptr]));
+        glNormal3dv(&(triangleNormals[tid_ptr]));
         glVertex3dv(&(coords[vid2_ptr]));
         glEnd();
     }
       //drawSphere(edge_list->front().first,1,QColor(0,255,0,127),20);
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//    glDepthRange(0.0, 1.0);
+//    glDepthFunc(GL_LEQUAL);
+//    glDepthFunc(GL_LESS);
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 
 }
 
@@ -106,6 +119,8 @@ void DrawableSkel::setEdgeList(std::list<std::pair<Pointd, Pointd>> edges)
     edge_list = edges;
 }
 
+
+//usando l'angolo minimo
 bool DrawableSkel::isTrisOnBorder(Pointd a, Pointd b, Pointd c)
 {
     double soglia = 3.14159265/18.0;
@@ -121,10 +136,85 @@ bool DrawableSkel::isTrisOnBorder(Pointd a, Pointd b, Pointd c)
     double angle2 = acos(v1.dot(v3));
     double angle3 = acos(v2.dot(v3));
 
+    Pointd cross = v1.cross(v2);
+    double area = cross.normalize()/2;
 
-    //qDebug() << "angolo1 " << angle1 << " angolo2 " << angle2 << " angolo3 " << angle3 << "\n";
+//    qDebug() << "angolo1 " << angle1 << " angolo2 " << angle2 << " angolo3 " << angle3 << "soglia = "<<soglia<< "\n";
+
+//    qDebug() << "area = " <<area << "\n";
 
     if(angle1 < soglia || angle2 <soglia || angle3 < soglia)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+
+
+}
+//usando l'area minima
+bool DrawableSkel::isTrisOnBorder2(Pointd a, Pointd b, Pointd c)
+{
+    double soglia = 0.055 ;
+
+
+
+    Pointd v1 (a.x() - b.x(), a.y() - b.y(), a.z() - b.z() );
+    Pointd v2 (b.x() - c.x(), b.y() - c.y(), b.z() - c.z() );
+    Pointd v3 (a.x() - c.x(), a.y() - c.y(), a.z() - c.z() );
+    v1.normalize();
+    v2.normalize();
+    v3.normalize();
+
+    Pointd cross = v1.cross(v2);
+    double area = cross.normalize()/2;
+
+
+    if(area < soglia)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+
+
+}
+
+//usando l'area minima
+bool DrawableSkel::isTrisOnBorder2(int tid)
+{
+    int vid0     = tris[tid_ptr + 0];
+    int vid1     = tris[tid_ptr + 1];
+    int vid2     = tris[tid_ptr + 2];
+    int vid0_ptr = 3 * vid0;
+    int vid1_ptr = 3 * vid1;
+    int vid2_ptr = 3 * vid2;
+
+    Pointd a(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]);
+    Pointd b(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]);
+    Pointd c(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]);
+
+
+    double soglia = 0.055 ;
+
+
+
+    Pointd v1 (a.x() - b.x(), a.y() - b.y(), a.z() - b.z() );
+    Pointd v2 (b.x() - c.x(), b.y() - c.y(), b.z() - c.z() );
+    Pointd v3 (a.x() - c.x(), a.y() - c.y(), a.z() - c.z() );
+    v1.normalize();
+    v2.normalize();
+    v3.normalize();
+
+    Pointd cross = v1.cross(v2);
+    double area = cross.normalize()/2;
+
+
+    if(area < soglia)
     {
         return true;
     }

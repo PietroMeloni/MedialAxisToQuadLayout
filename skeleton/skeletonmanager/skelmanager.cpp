@@ -45,5 +45,6 @@ void SkeletonManager::on_butMakeSkel_clicked()
              mainWindow->updateGlCanvas();
          }
      }
+
 }
 

@@ -43,6 +43,8 @@ class DrawableSkel : public DrawableMesh,
 
         void setEdgeList(std::list<std::pair<Pointd, Pointd>> edges);
         static bool isTrisOnBorder(Pointd a, Pointd b, Pointd c);
+        static bool isTrisOnBorder2(Pointd a, Pointd b, Pointd c);
+        static bool isTrisOnBorder2(int tid);
 
 };
 

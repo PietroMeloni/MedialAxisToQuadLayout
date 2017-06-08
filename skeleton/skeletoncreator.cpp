@@ -33,7 +33,7 @@ void SkeletonCreator::computeSkeleton(const char* path)
     Skeletonization mcs(tmesh);
 
 
-    for(int i=0; i<1; i++)
+    for(int i=0; i<2; i++)
     {
 
     // 1. Contract the mesh by mean curvature flow.
