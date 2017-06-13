@@ -2,11 +2,12 @@
 
 SkeletonCreator::SkeletonCreator()
 {
-
+    surfaceArea = 0;
 }
 
 SkeletonCreator::SkeletonCreator(const char* input)
 {
+    surfaceArea = 0;
     computeSkeleton(input);
 }
 
@@ -14,7 +15,7 @@ void SkeletonCreator::computeSkeleton(const char* path)
 {
     std::ifstream input(path);
     std::pair<Pointd, Pointd> lato;
-
+    Pointd a, b, c;
     //skelComponents edgesTAndCoords;
 
     std::list<std::pair<Pointd, Pointd>> listaLati;
@@ -56,7 +57,19 @@ void SkeletonCreator::computeSkeleton(const char* path)
 //        qDebug() << "Is triangle? " << (face->is_triangle()) << "\n";
 //        qDebug() << "Is quad? " << (face->is_quad()) << "\n";
 
+        a.setX(face->halfedge()->vertex()->point().x());
+        a.setY(face->halfedge()->vertex()->point().y());
+        a.setZ(face->halfedge()->vertex()->point().z());
+        b.setX(face->halfedge()->next()->vertex()->point().x());
+        b.setY(face->halfedge()->next()->vertex()->point().y());
+        b.setZ(face->halfedge()->next()->vertex()->point().z());
+        c.setX(face->halfedge()->next()->next()->vertex()->point().x());
+        c.setY(face->halfedge()->next()->next()->vertex()->point().y());
+        c.setZ(face->halfedge()->next()->next()->vertex()->point().z());
+//        qDebug() << "Is triangle? " << (face->is_triangle()) << "\n";
+//        qDebug() << "Is quad? " << (face->is_quad()) << "\n";
 
+        surfaceArea += getTriangleArea(a,b,c);
 
         Meso_skeleton::Halfedge_const_handle hch = begin;
         do
@@ -101,7 +114,7 @@ void SkeletonCreator::computeSkeleton(const char* path)
     }
 
     saveObj("/home/pietro/Desktop/prova.obj", coord, triangles);
-
+    qDebug() << "SurfaceArea = " << surfaceArea;
     listaEdge = listaLati;
     listaPunti = coord;
     listaTriangoli = triangles;
@@ -157,5 +170,17 @@ void SkeletonCreator::computeMesoSkeleton(const char* path)
 
 }
 
+double SkeletonCreator::getTriangleArea(Pointd a, Pointd b, Pointd c)
+{
+
+    Pointd v1 = b - a;
+    Pointd v2 = c - a;
+
+    Pointd cross = v1.cross(v2);
+    double area = cross.getLength()/2;
+
+    return area;
+
+}
 
 

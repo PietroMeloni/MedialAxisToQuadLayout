@@ -13,6 +13,7 @@
 #include "trimesh/load_save_trimesh.h"
 
 
+
 typedef CGAL::Simple_cartesian<double>                           Kernel;
 typedef Kernel::Point_3                                          CgalPoint;
 typedef CGAL::Polyhedron_3<Kernel>                               Polyhedron3;
@@ -50,10 +51,17 @@ class SkeletonCreator
             return listaPunti;
         }
 
+        inline double getSurfaceArea()
+        {
+            return surfaceArea;
+        }
+
 private:
         std::list<std::pair<Pointd, Pointd> > listaEdge;
         std::vector<int> listaTriangoli;
         std::vector<double> listaPunti;
+        double surfaceArea;
+        static double getTriangleArea(Pointd a, Pointd b, Pointd c);
 
 };
 
