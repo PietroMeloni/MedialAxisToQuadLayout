@@ -8,7 +8,24 @@ DrawableSkel::DrawableSkel()
 DrawableSkel::DrawableSkel(const char *file_name)
 {
     init();
+    triTrashold = 10;
     SkeletonCreator skelCreator(file_name);
+    edge_list = skelCreator.getListaEdge();
+    tris = skelCreator.getListaTriangoli();
+    coords = skelCreator.getListaPunti();
+    buildAdjacency();
+    updateNormals();
+    updateBbox();
+
+}
+
+DrawableSkel::DrawableSkel(const char *file_name, int compr, double trashold)
+{
+    init();
+    SkeletonCreator skelCreator(file_name, compr);
+
+
+    triTrashold = trashold;
     edge_list = skelCreator.getListaEdge();
     tris = skelCreator.getListaTriangoli();
     coords = skelCreator.getListaPunti();
@@ -86,8 +103,14 @@ void DrawableSkel::draw() const
         haveNeighborsSmallArea = true;
         if(isTrisOnBorder2(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
                           Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
-                          Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2])))
+                          Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
+                          triTrashold)||
+           isTrisOnBorder(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
+                           Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
+                           Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
+                           15))
         {
+
             //controllo se i vicini hanno area piccola anche loro tramite
             //i vettori tri2tri "riempiti" da metodi già esistenti come
             //buildAdjagency. In questo caso, se un triangolo ha almeno 2 vicini
@@ -106,7 +129,8 @@ void DrawableSkel::draw() const
                 //controllo l'area del vicino, presuppongo che i vicini siano 3 (constatato che non è sicuro)
                 if(!isTrisOnBorder2(Pointd(coords[vid0_ptr0],coords[vid0_ptr0+1],coords[vid0_ptr0+2]),
                                   Pointd(coords[vid1_ptr0],coords[vid1_ptr0+1],coords[vid1_ptr0+2]),
-                                  Pointd(coords[vid2_ptr0],coords[vid2_ptr0+1],coords[vid2_ptr0+2])))
+                                  Pointd(coords[vid2_ptr0],coords[vid2_ptr0+1],coords[vid2_ptr0+2]),
+                                    triTrashold))
                 {
 
                     j++;
@@ -124,7 +148,7 @@ void DrawableSkel::draw() const
                 glBegin(GL_TRIANGLES);
 
                 glColor3f(0.0, 0.0, 1.0);
-                //qDebug()<< "blue";
+
                 //qDebug()<< "tri2tri[ "<<tid <<"] = "<< tri2tri[tid] << ". Size= " << tri2tri[tid].size()<<"\n" ;
             }
             //altrimenti coloro di rosso
@@ -170,27 +194,12 @@ void DrawableSkel::setEdgeList(std::list<std::pair<Pointd, Pointd>> edges)
 
 
 //usando l'angolo minimo
-bool DrawableSkel::isTrisOnBorder(Pointd a, Pointd b, Pointd c)
+bool DrawableSkel::isTrisOnBorder(Pointd a, Pointd b, Pointd c, double trasholdAngle)
 {
-    double soglia = 3.14159265/18.0;
+    double soglia = (3.14159265/180.0)*trasholdAngle;
+    double minAngle = trisCharacteristic::getTriangleMinAngle(a,b,c);
 
-    Pointd v1 (a.x() - b.x(), a.y() - b.y(), a.z() - b.z() );
-    Pointd v2 (b.x() - c.x(), b.y() - c.y(), b.z() - c.z() );
-    Pointd v3 (a.x() - c.x(), a.y() - c.y(), a.z() - c.z() );
-    v1.normalize();
-    v2.normalize();
-    v3.normalize();
-
-    double angle1 = acos(v1.dot(v2));
-    double angle2 = acos(v1.dot(v3));
-    double angle3 = acos(v2.dot(v3));
-
-
-//    qDebug() << "angolo1 " << angle1 << " angolo2 " << angle2 << " angolo3 " << angle3 << "soglia = "<<soglia<< "\n";
-
-//    qDebug() << "area = " <<area << "\n";
-
-    if(angle1 < soglia || angle2 <soglia || angle3 < soglia)
+    if(soglia > minAngle)
     {
         return true;
     }
@@ -202,15 +211,12 @@ bool DrawableSkel::isTrisOnBorder(Pointd a, Pointd b, Pointd c)
 
 }
 //usando l'area minima
-bool DrawableSkel::isTrisOnBorder2(Pointd a, Pointd b, Pointd c)
+bool DrawableSkel::isTrisOnBorder2(Pointd a, Pointd b, Pointd c, double trashold)
 {
-    double soglia = 0.115 ;
+    double soglia = trashold ;
 
-    Pointd v1 = b - a;
-    Pointd v2 = c - a;
 
-    Pointd cross = v1.cross(v2);
-    double area = cross.getLength()/2;
+    double area = trisCharacteristic::getTriangleArea(a,b,c);
 
 
     if(area < soglia)
@@ -225,9 +231,9 @@ bool DrawableSkel::isTrisOnBorder2(Pointd a, Pointd b, Pointd c)
 
 }
 
-bool DrawableSkel::isTrisOnBorder3(Pointd a, Pointd b, Pointd c)
+bool DrawableSkel::isTrisOnBorder3(Pointd a, Pointd b, Pointd c, double trashold)
 {
-    double soglia = 0.015 ;
+    double soglia = trashold ;
 
 //    qDebug()<< "Punti: "<< a.x() << " "<< a.y() << " "<< a.z()
 //            << ";      "<< b.x() << " "<< b.y() << " "<< b.z()
@@ -245,7 +251,6 @@ bool DrawableSkel::isTrisOnBorder3(Pointd a, Pointd b, Pointd c)
     double angle2 = acos(v1.dot(v3));
     double angle3 = acos(v2.dot(v3));
 
-    qDebug() <<angle2;
 
     double area = a.dist(b)*a.dist(c)*sin(angle2)/2;
 

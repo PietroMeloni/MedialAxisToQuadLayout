@@ -1,7 +1,7 @@
 #ifndef DRAWABLESKEL_H
 #define DRAWABLESKEL_H
 
-#include <math.h>
+#include "common/trischar.h"
 #include "viewer/interfaces/drawable_object.h"
 #include "viewer/interfaces/drawable_mesh.h"
 #include "skel.h"
@@ -17,6 +17,7 @@ class DrawableSkel : public DrawableMesh,
     public:
         DrawableSkel();
         DrawableSkel(const char* file_name);
+        DrawableSkel(const char* file_name, int compressions, double trashold);
         DrawableSkel(const Skel *skel);
 
         ~DrawableSkel();
@@ -39,12 +40,13 @@ class DrawableSkel : public DrawableMesh,
         MainWindow* mainWindow;
         DrawableTrimesh* trimesh;
         DrawableSkel* dsk;
+        double triTrashold;
 
 
         void setEdgeList(std::list<std::pair<Pointd, Pointd>> edges);
-        static bool isTrisOnBorder(Pointd a, Pointd b, Pointd c);
-        static bool isTrisOnBorder2(Pointd a, Pointd b, Pointd c);
-        static bool isTrisOnBorder3(Pointd a, Pointd b, Pointd c);
+        static bool isTrisOnBorder(Pointd a, Pointd b, Pointd c, double trasholdAngle);
+        static bool isTrisOnBorder2(Pointd a, Pointd b, Pointd c, double trasholdAngle);
+        static bool isTrisOnBorder3(Pointd a, Pointd b, Pointd c, double trasholdAngle);
 
 };
 

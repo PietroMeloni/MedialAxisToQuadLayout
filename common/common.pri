@@ -48,10 +48,12 @@ HEADERS += \
     $$PWD/common/file_conversions.h \
     $$PWD/common/serializable_object.h \
     $$PWD/common/load_save_file.h \
-    $$PWD/common/color.h
+    $$PWD/common/color.h \
+    $$PWD/common/trischar.h
 
 SOURCES += \
-    $$PWD/common/load_save_file.cpp
+    $$PWD/common/load_save_file.cpp \
+    $$PWD/common/trischar.cpp
 
 INCLUDEPATH += $$PWD
 

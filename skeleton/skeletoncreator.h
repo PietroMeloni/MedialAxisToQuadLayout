@@ -11,6 +11,7 @@
 #include <CGAL/Mean_curvature_flow_skeletonization.h>
 #include "skel.h"
 #include "trimesh/load_save_trimesh.h"
+#include "common/trischar.h"
 
 
 
@@ -35,8 +36,12 @@ class SkeletonCreator
     public:
         SkeletonCreator();
         SkeletonCreator(const char* input);
+        SkeletonCreator(const char* input, int numCompressions);
         void computeSkeleton(const char* input);
+        void computeSkeleton(const char* input, int numCompressions);
         void computeMesoSkeleton(const char* input);
+        void compressMesoSkeleton();
+
 
         inline std::list<std::pair<Pointd, Pointd> > getListaEdge()
         {

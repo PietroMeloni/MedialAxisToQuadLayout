@@ -10,6 +10,7 @@
 #include "cgalskeletoninterface.h"
 #include <QErrorMessage>
 #include <QDebug>
+#include <QString>
 
 namespace Ui {
     class SkeletonManager;
@@ -33,10 +34,12 @@ class SkeletonManager : public QFrame
         MainWindow* mainWindow;
         DrawableTrimesh* trimesh;
         DrawableSkel* dsk;
+        const char* pathOfMyOFFFile;
 
     public slots:
 
         void on_butMakeSkel_clicked();
+        void on_butNumCompr_clicked();
 };
 
 
