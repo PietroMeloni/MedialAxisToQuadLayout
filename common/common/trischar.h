@@ -1,7 +1,7 @@
 #ifndef TRISCHAR_H
 #define TRISCHAR_H
 
-#endif // TRISCHAR_H
+
 #include <math.h>
 #include "point.h"
 class trisCharacteristic
@@ -13,3 +13,4 @@ public:
 };
 
 
+#endif // TRISCHAR_H

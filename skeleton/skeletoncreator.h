@@ -40,7 +40,7 @@ class SkeletonCreator
         void computeSkeleton(const char* input);
         void computeSkeleton(const char* input, int numCompressions);
         void computeMesoSkeleton(const char* input);
-        void compressMesoSkeleton();
+        void compressMesoSkeleton(double trashold);
 
 
         inline std::list<std::pair<Pointd, Pointd> > getListaEdge()

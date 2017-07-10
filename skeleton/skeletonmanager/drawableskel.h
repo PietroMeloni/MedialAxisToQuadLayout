@@ -15,6 +15,10 @@ class DrawableSkel : public DrawableMesh,
                      public Trimesh<double>
 {
     public:
+
+        const int TID_ELIM = -5;
+
+
         DrawableSkel();
         DrawableSkel(const char* file_name);
         DrawableSkel(const char* file_name, int compressions, double trashold);
@@ -29,6 +33,7 @@ class DrawableSkel : public DrawableMesh,
 
         bool isVisible() const;
         void init();
+        void compressSkeletonUntilConverge();
 
 
 
@@ -47,6 +52,11 @@ class DrawableSkel : public DrawableMesh,
         static bool isTrisOnBorder(Pointd a, Pointd b, Pointd c, double trasholdAngle);
         static bool isTrisOnBorder2(Pointd a, Pointd b, Pointd c, double trasholdAngle);
         static bool isTrisOnBorder3(Pointd a, Pointd b, Pointd c, double trasholdAngle);
+        bool mergeTwoVertexes(int tid);
+        bool shiftTriangleList();
+        bool shiftTriangleList(int tid);
+        bool deleteTriangle(int tid);
+
 
 };
 

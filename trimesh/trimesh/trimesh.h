@@ -26,7 +26,7 @@ typedef std::pair<int,int> edge;
 
 /*-------------- INLINE UTILITY FUNCTIONS --------------*/
 
-inline edge uniqueEdge(int v0, int v1)
+inline edge uniqueEdge(unsigned int v0, unsigned int v1)
 {
     edge e;
     e.first  = std::min(v0,v1);
@@ -154,23 +154,27 @@ template<typename real> class Trimesh
             vtx2tri.clear();
             tri2tri.clear();
 
-            vtx2vtx.resize(numVertices());
-            vtx2tri.resize(numVertices());
-            tri2tri.resize(numTriangles());
+            vtx2vtx.resize(numTriangles()*3);
+            vtx2tri.resize(numTriangles()*3);
+            tri2tri.resize(numTriangles()*3);
 
             std::set<edge>     edges;
             std::map<edge,int> edge2tri;
-
-            for(int tid=0; tid<numTriangles(); ++tid)
+            int tid=0;
+            int tid_ptr;
+            unsigned int vid;
+            unsigned int adj;
+            edge e;
+            for(tid=0; tid<numTriangles(); ++tid)
             {
-                int tid_ptr = tid * 3;
+                tid_ptr = tid * 3;
                 for(int i=0; i<3; ++i)
                 {
-                    int vid = tris[tid_ptr + i];
+                    vid = tris[tid_ptr + i];
                     vtx2tri[vid].push_back(tid);
 
-                    int adj = tris[tid_ptr + (i+1)%3];
-                    edge e = uniqueEdge(vid,adj);
+                    adj = tris[tid_ptr + (i+1)%3];
+                    e = uniqueEdge(vid,adj);
                     edges.insert(e);
 
                     std::map<edge,int>::iterator query = edge2tri.find(e);

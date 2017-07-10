@@ -40,6 +40,7 @@ class SkeletonManager : public QFrame
 
         void on_butMakeSkel_clicked();
         void on_butNumCompr_clicked();
+        void on_butDeleteDTri_clicked();
 };
 
 

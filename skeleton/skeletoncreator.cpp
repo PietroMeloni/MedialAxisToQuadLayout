@@ -233,26 +233,26 @@ void SkeletonCreator::computeMesoSkeleton(const char* path)
 
 }
 
-void SkeletonCreator::compressMesoSkeleton(std::vector<int>* tris, std::vector<double>* points, double trashold)
+void SkeletonCreator::compressMesoSkeleton(double trashold)
 {
 //    for(int tid=0; tid<n_tris; ++tid) {
 //        int tid_ptr  = 3 * tid;
-//        int vid0     = tris[tid_ptr + 0];
-//        int vid1     = tris[tid_ptr + 1];
-//        int vid2     = tris[tid_ptr + 2];
+//        int vid0     = listaTriangoli[tid_ptr + 0];
+//        int vid1     = listaTriangoli[tid_ptr + 1];
+//        int vid2     = listaTriangoli[tid_ptr + 2];
 //        int vid0_ptr = 3 * vid0;
 //        int vid1_ptr = 3 * vid1;
 //        int vid2_ptr = 3 * vid2;
 //        int j=0;
-//        haveNeighborsSmallArea = true;
-//        if(isTrisOnBorder2(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
+
+//        if(trisCharacteristic::getTriangleArea(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
 //                          Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
-//                          Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
-//                          triTrashold)||
-//           isTrisOnBorder(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
+//                          Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]))
+//                          <triTrashold||
+//           trisCharacteristic::getTriangleMinAngle(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
 //                           Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
-//                           Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
-//                           15))
+//                           Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]))
+//                           <15)
 //        {
 
 //            //controllo se i vicini hanno area piccola anche loro tramite

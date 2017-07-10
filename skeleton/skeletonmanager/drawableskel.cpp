@@ -55,6 +55,35 @@ void DrawableSkel::init()
     DrawableMesh::init();
 }
 
+void DrawableSkel::compressSkeletonUntilConverge()
+{
+
+    for(int tid=0; tid< tris.size()/3; ++tid)
+    {
+        int tid_ptr  = 3 * tid;
+        int vid0     = tris[tid_ptr + 0];
+        int vid1     = tris[tid_ptr + 1];
+        int vid2     = tris[tid_ptr + 2];
+        int vid0_ptr = 3 * vid0;
+        int vid1_ptr = 3 * vid1;
+        int vid2_ptr = 3 * vid2;
+
+        if(isTrisOnBorder2(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
+                          Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
+                          Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
+                          triTrashold))
+        {
+
+            mergeTwoVertexes(tid);
+            //shiftTriangleList();
+            buildAdjacency();
+            tid--;
+
+        }
+
+    }
+}
+
 double DrawableSkel::sceneRadius() const
 {
     return bbox.diag();
@@ -100,15 +129,12 @@ void DrawableSkel::draw() const
         int vid1_ptr = 3 * vid1;
         int vid2_ptr = 3 * vid2;
         int j=0;
+
         haveNeighborsSmallArea = true;
         if(isTrisOnBorder2(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
                           Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
                           Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
-                          triTrashold)||
-           isTrisOnBorder(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
-                           Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
-                           Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
-                           15))
+                          triTrashold))
         {
 
             //controllo se i vicini hanno area piccola anche loro tramite
@@ -266,4 +292,222 @@ bool DrawableSkel::isTrisOnBorder3(Pointd a, Pointd b, Pointd c, double trashold
     }
 
 
+}
+/**
+ * @brief DrawableSkel::mergeTwoVertexes merge 2 points and deletes 2 triangles.
+ * @param tid id of the triangle that will be deleted with one of his neighbours
+ * @return true if we can merge, false otherwise
+ */
+bool DrawableSkel::mergeTwoVertexes(int tid)
+{
+    int tid_ptr  = 3 * tid;
+    int vid0     = tris[tid_ptr + 0];
+    int vid1     = tris[tid_ptr + 1];
+    int vid2     = tris[tid_ptr + 2];
+    int vid0_ptr = 3 * vid0;
+    int vid1_ptr = 3 * vid1;
+    int vid2_ptr = 3 * vid2;
+
+
+    int neighboursNull = 0;
+    bool found = false;
+
+    if(tri2tri[tid].size() != 0)
+    {
+
+        for(int i=0; i < tri2tri[tid].size()&&!found; i++)
+        {
+            int tid_ptr0  = 3 * (tri2tri[tid])[i];
+            if( tid_ptr0 > 0)
+            {
+                int vid00     = tris[tid_ptr0 + 0];
+                int vid10     = tris[tid_ptr0 + 1];
+                int vid20     = tris[tid_ptr0 + 2];
+                int vid0_ptr0 = 3 * vid00;
+                int vid1_ptr0 = 3 * vid10;
+                int vid2_ptr0 = 3 * vid20;
+
+                //provo a cercare se uno dei primi due triangoli vicini è nel bordo.
+                //Se lo è, uso il vertice di quel triangolo come vertice nel quale
+                //unire quello che devo cancellare. Il punto cancellato diventerà
+                //un doppione di un altro nella lista (in teoria non dovrebbe disturbare).
+                if(i < 3)
+                {
+                    if(vid00 == vid0 || vid00 == vid1 || vid00 == vid2)
+                    {
+                        if(vid10 == vid0 || vid10 == vid1 || vid10 == vid2)
+                        {
+                            deleteTriangle((tri2tri[tid])[i]);
+                            deleteTriangle(tid);
+                            shiftTriangleList(tid);
+                            shiftTriangleList((tri2tri[tid])[i]);
+                            coords[vid0_ptr0 + 0] = coords[vid1_ptr0 + 0];
+                            coords[vid0_ptr0 + 1] = coords[vid1_ptr0 + 1];
+                            coords[vid0_ptr0 + 2] = coords[vid1_ptr0 + 2];
+                            found = true;
+                        }
+                        else
+                        {
+                            if(vid20 == vid0 || vid20 == vid1 || vid20 == vid2)
+                            {
+                                deleteTriangle((tri2tri[tid])[i]);
+                                deleteTriangle(tid);
+                                shiftTriangleList(tid);
+                                shiftTriangleList((tri2tri[tid])[i]);
+                                coords[vid0_ptr0 + 0] = coords[vid2_ptr0 + 0];
+                                coords[vid0_ptr0 + 1] = coords[vid2_ptr0 + 1];
+                                coords[vid0_ptr0 + 2] = coords[vid2_ptr0 + 2];
+                                found = true;
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        if(vid10 == vid0 || vid10 == vid1 || vid10 == vid2)
+                        {
+                            deleteTriangle((tri2tri[tid])[i]);
+                            deleteTriangle(tid);
+                            shiftTriangleList(tid);
+                            shiftTriangleList((tri2tri[tid])[i]);
+                            coords[vid1_ptr0 + 0] = coords[vid2_ptr0 + 0];
+                            coords[vid1_ptr0 + 1] = coords[vid2_ptr0 + 1];
+                            coords[vid1_ptr0 + 2] = coords[vid2_ptr0 + 2];
+                            found = true;
+                        }
+                    }
+                }
+                //optimization required
+                else
+                {
+
+                }
+
+            }
+            else
+            {
+                neighboursNull++;
+            }
+        }
+    }
+    else
+    {
+        deleteTriangle(tid);
+        shiftTriangleList(tid);
+        coords[vid0_ptr + 0] = coords[vid1_ptr + 0];
+        coords[vid0_ptr + 1] = coords[vid1_ptr + 1];
+        coords[vid0_ptr + 2] = coords[vid1_ptr + 2];
+    }
+    if(neighboursNull == 3)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+/** Quando un triangolo viene eliminato per una ragione o per un'altra
+ *  la lista può essere shiftata se al posto delle posizioni delle coordinate
+ *  del triangolo cancellato si inserisce la costante TID_ELIM
+ */
+
+bool DrawableSkel::shiftTriangleList()
+{
+    for(int tid = 0; tid < tris.size()/3; tid++)
+    {
+        int tid_ptr  = 3 * tid;
+        int vid0     = tris[tid_ptr + 0];
+        int vid1     = tris[tid_ptr + 1];
+        int vid2     = tris[tid_ptr + 2];
+
+        if(vid0 == TID_ELIM && vid1 == TID_ELIM && vid2 == TID_ELIM)
+        {
+            if(tris[tris.size()-1] != TID_ELIM)
+            {
+                tris[tid_ptr+2] = tris[tris.size()-1];
+                tris.pop_back();
+                tris[tid_ptr+1] = tris[tris.size()-1];
+                tris.pop_back();
+                tris[tid_ptr+0] = tris[tris.size()-1];
+                tris.pop_back();
+            }
+            else
+            {
+                 tris.pop_back();
+                 tris.pop_back();
+                 tris.pop_back();
+                 tid--;
+            }
+        }
+        else
+        {
+            if(vid0 == TID_ELIM || vid1 == TID_ELIM || vid2 == TID_ELIM)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+
+}
+
+bool DrawableSkel::shiftTriangleList(int tid)
+{
+    int tid_ptr  = 3 * tid;
+    int vid0     = tris[tid_ptr + 0];
+    int vid1     = tris[tid_ptr + 1];
+    int vid2     = tris[tid_ptr + 2];
+    bool delComplete = true;
+    do
+    {
+        if(!(vid2 == tris[tris.size()-1]))
+        {
+            if(vid0 == TID_ELIM && vid1 == TID_ELIM && vid2 == TID_ELIM)
+            {
+                if(tris[tris.size()-1] != TID_ELIM)
+                {
+                    tris[tid_ptr+2] = tris[tris.size()-1];
+                    tris.pop_back();
+                    tris[tid_ptr+1] = tris[tris.size()-1];
+                    tris.pop_back();
+                    tris[tid_ptr+0] = tris[tris.size()-1];
+                    tris.pop_back();
+                }
+                else
+                {
+                     tris.pop_back();
+                     tris.pop_back();
+                     tris.pop_back();
+                     delComplete = false;
+
+                }
+            }
+            else
+            {
+                if(vid0 == TID_ELIM || vid1 == TID_ELIM || vid2 == TID_ELIM)
+                {
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            tris.pop_back();
+            tris.pop_back();
+            tris.pop_back();
+        }
+    }
+    while(!delComplete);
+    return true;
+}
+
+bool DrawableSkel::deleteTriangle(int tid)
+{
+    int tid_ptr  = 3 * tid;
+    tris[tid_ptr + 0] = TID_ELIM;
+    tris[tid_ptr + 1] = TID_ELIM;
+    tris[tid_ptr + 2] = TID_ELIM;
+    return true;
 }
