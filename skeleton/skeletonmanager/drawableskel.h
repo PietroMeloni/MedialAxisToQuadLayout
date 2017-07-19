@@ -53,9 +53,13 @@ class DrawableSkel : public DrawableMesh,
         static bool isTrisOnBorder2(Pointd a, Pointd b, Pointd c, double trasholdAngle);
         static bool isTrisOnBorder3(Pointd a, Pointd b, Pointd c, double trasholdAngle);
         bool mergeTwoVertexes(int tid);
+        bool mergeTwoVertexes(int tid, Pointd a, Pointd b);
         bool shiftTriangleList();
         bool shiftTriangleList(int tid);
         bool deleteTriangle(int tid);
+        int minDistanceBetweenThreePoints(Pointd a, Pointd b, Pointd c);
+        bool hasTidThisTwoVertexes(int tid, Pointd a, Pointd b);
+        bool deleteVTX(int vid);
 
 
 };

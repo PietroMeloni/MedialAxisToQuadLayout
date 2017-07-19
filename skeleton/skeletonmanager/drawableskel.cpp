@@ -71,11 +71,15 @@ void DrawableSkel::compressSkeletonUntilConverge()
         if(isTrisOnBorder2(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
                           Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
                           Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
-                          triTrashold))
+                          triTrashold)||
+           isTrisOnBorder(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
+                           Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
+                           Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
+                           15))
         {
 
             mergeTwoVertexes(tid);
-            //shiftTriangleList();
+            shiftTriangleList();
             buildAdjacency();
             tid--;
 
@@ -134,7 +138,11 @@ void DrawableSkel::draw() const
         if(isTrisOnBorder2(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
                           Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
                           Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
-                          triTrashold))
+                          triTrashold)||
+           isTrisOnBorder(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
+                          Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
+                          Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
+                          15))
         {
 
             //controllo se i vicini hanno area piccola anche loro tramite
@@ -307,6 +315,9 @@ bool DrawableSkel::mergeTwoVertexes(int tid)
     int vid0_ptr = 3 * vid0;
     int vid1_ptr = 3 * vid1;
     int vid2_ptr = 3 * vid2;
+    Pointd vA(coords[vid0_ptr+0], coords[vid0_ptr+1], coords[vid0_ptr+2]);
+    Pointd vB(coords[vid1_ptr+0], coords[vid1_ptr+1], coords[vid1_ptr+2]);
+    Pointd vC(coords[vid2_ptr+0], coords[vid2_ptr+1], coords[vid2_ptr+2]);
 
 
     int neighboursNull = 0;
@@ -318,7 +329,7 @@ bool DrawableSkel::mergeTwoVertexes(int tid)
         for(int i=0; i < tri2tri[tid].size()&&!found; i++)
         {
             int tid_ptr0  = 3 * (tri2tri[tid])[i];
-            if( tid_ptr0 > 0)
+            if( tid_ptr0 >= 0)
             {
                 int vid00     = tris[tid_ptr0 + 0];
                 int vid10     = tris[tid_ptr0 + 1];
@@ -339,8 +350,8 @@ bool DrawableSkel::mergeTwoVertexes(int tid)
                         {
                             deleteTriangle((tri2tri[tid])[i]);
                             deleteTriangle(tid);
-                            shiftTriangleList(tid);
-                            shiftTriangleList((tri2tri[tid])[i]);
+                            //shiftTriangleList(tid);
+                            //shiftTriangleList((tri2tri[tid])[i]);
                             coords[vid0_ptr0 + 0] = coords[vid1_ptr0 + 0];
                             coords[vid0_ptr0 + 1] = coords[vid1_ptr0 + 1];
                             coords[vid0_ptr0 + 2] = coords[vid1_ptr0 + 2];
@@ -352,8 +363,8 @@ bool DrawableSkel::mergeTwoVertexes(int tid)
                             {
                                 deleteTriangle((tri2tri[tid])[i]);
                                 deleteTriangle(tid);
-                                shiftTriangleList(tid);
-                                shiftTriangleList((tri2tri[tid])[i]);
+                                //shiftTriangleList(tid);
+                                //shiftTriangleList((tri2tri[tid])[i]);
                                 coords[vid0_ptr0 + 0] = coords[vid2_ptr0 + 0];
                                 coords[vid0_ptr0 + 1] = coords[vid2_ptr0 + 1];
                                 coords[vid0_ptr0 + 2] = coords[vid2_ptr0 + 2];
@@ -368,19 +379,14 @@ bool DrawableSkel::mergeTwoVertexes(int tid)
                         {
                             deleteTriangle((tri2tri[tid])[i]);
                             deleteTriangle(tid);
-                            shiftTriangleList(tid);
-                            shiftTriangleList((tri2tri[tid])[i]);
+                            //shiftTriangleList(tid);
+                            //shiftTriangleList((tri2tri[tid])[i]);
                             coords[vid1_ptr0 + 0] = coords[vid2_ptr0 + 0];
                             coords[vid1_ptr0 + 1] = coords[vid2_ptr0 + 1];
                             coords[vid1_ptr0 + 2] = coords[vid2_ptr0 + 2];
                             found = true;
                         }
                     }
-                }
-                //optimization required
-                else
-                {
-
                 }
 
             }
@@ -393,7 +399,7 @@ bool DrawableSkel::mergeTwoVertexes(int tid)
     else
     {
         deleteTriangle(tid);
-        shiftTriangleList(tid);
+      //shiftTriangleList(tid);
         coords[vid0_ptr + 0] = coords[vid1_ptr + 0];
         coords[vid0_ptr + 1] = coords[vid1_ptr + 1];
         coords[vid0_ptr + 2] = coords[vid1_ptr + 2];
@@ -407,6 +413,8 @@ bool DrawableSkel::mergeTwoVertexes(int tid)
         return true;
     }
 }
+
+
 
 /** Quando un triangolo viene eliminato per una ragione o per un'altra
  *  la lista può essere shiftata se al posto delle posizioni delle coordinate
@@ -510,4 +518,117 @@ bool DrawableSkel::deleteTriangle(int tid)
     tris[tid_ptr + 1] = TID_ELIM;
     tris[tid_ptr + 2] = TID_ELIM;
     return true;
+}
+/**
+ * @brief DrawableSkel::minDistanceBetweenThreePoints calculate minimum distance between points
+ * @param a
+ * @param b
+ * @param c
+ * @return 0 if the edge is first-second, 1 if it is first third, -1 if it is second third
+ */
+int DrawableSkel::minDistanceBetweenThreePoints(Pointd a, Pointd b, Pointd c)
+{
+    double distanceAB = a.dist(b);
+    double distanceAC = a.dist(c);
+    double distanceBC = b.dist(c);
+
+    if(distanceAB < distanceAC)
+    {
+        if(distanceAB < distanceBC)
+        {
+            return 0;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    else
+    {
+        if(distanceAC < distanceBC)
+        {
+            return 1;
+
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+
+}
+
+bool DrawableSkel::hasTidThisTwoVertexes(int tid, Pointd a, Pointd b)
+{
+    int tid_ptr  = 3 * tid;
+    int vid0     = tris[tid_ptr + 0];
+    int vid1     = tris[tid_ptr + 1];
+    int vid2     = tris[tid_ptr + 2];
+    int vid0_ptr = 3*vid0;
+    int vid1_ptr = 3*vid1;
+    int vid2_ptr = 3*vid2;
+    Pointd tA(coords[vid0_ptr+0],coords[vid0_ptr+1],coords[vid0_ptr+2]);
+    Pointd tB(coords[vid1_ptr+0],coords[vid1_ptr+1],coords[vid1_ptr+2]);
+    Pointd tC(coords[vid2_ptr+0],coords[vid2_ptr+1],coords[vid2_ptr+2]);
+
+    if(tA == a)
+    {
+        if(tB == b || tC == b)
+        {
+            return true;
+
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if(tB == a)
+        {
+            if(tC == b)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if(tB == b)
+            {
+                if(tC == a)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+}
+
+bool DrawableSkel::deleteVTX(int vid)
+{
+//    int tid;
+//    int tid_ptr;
+//    for(unsigned int i=0; vtx2tri[vid].size(); i++)
+//    {
+//        tid = (vtx2tri[vid])[i];
+//        tid_ptr = tid*3;
+//        if(tris[tid_ptr] == vid)
+//    }
+
+
 }
