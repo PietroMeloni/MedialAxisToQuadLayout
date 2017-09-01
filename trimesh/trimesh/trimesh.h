@@ -15,6 +15,7 @@
 
 #include <common/bounding_box.h>
 #include "load_save_trimesh.h"
+#include "qdebug.h"
 
 #ifdef EIGENMESH_DEFINED
 #include <eigenmesh/eigenmesh.h>
@@ -154,26 +155,23 @@ template<typename real> class Trimesh
             vtx2tri.clear();
             tri2tri.clear();
 
-            vtx2vtx.resize(numTriangles()*3);
-            vtx2tri.resize(numTriangles()*3);
-            tri2tri.resize(numTriangles()*3);
+            vtx2vtx.resize(numVertices());
+            vtx2tri.resize(numVertices());
+            tri2tri.resize(numTriangles());
 
             std::set<edge>     edges;
             std::map<edge,int> edge2tri;
-            int tid=0;
-            int tid_ptr;
-            unsigned int vid;
-            unsigned int adj;
             edge e;
-            for(tid=0; tid<numTriangles(); ++tid)
+            for(int tid=0; tid<numTriangles(); ++tid)
             {
-                tid_ptr = tid * 3;
+                int tid_ptr = tid * 3;
+
                 for(int i=0; i<3; ++i)
                 {
-                    vid = tris[tid_ptr + i];
+                    int vid = tris[tid_ptr + i];
                     vtx2tri[vid].push_back(tid);
 
-                    adj = tris[tid_ptr + (i+1)%3];
+                    int adj = tris[tid_ptr + (i+1)%3];
                     e = uniqueEdge(vid,adj);
                     edges.insert(e);
 
@@ -186,7 +184,15 @@ template<typename real> class Trimesh
                     {
                         int nbr_tri = query->second;
                         tri2tri[tid].push_back(nbr_tri);
+                        if(tri2tri[tid].size() > 3)
+                        {
+                            qDebug()<< "errore strano?";
+                        }
                         tri2tri[nbr_tri].push_back(tid);
+                        if(tri2tri[nbr_tri].size() > 3)
+                        {
+                            qDebug()<< "altro errore strano";
+                        }
                     }
                 }
             }

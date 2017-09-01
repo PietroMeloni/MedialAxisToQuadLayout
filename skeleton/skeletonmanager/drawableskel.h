@@ -1,6 +1,9 @@
 #ifndef DRAWABLESKEL_H
 #define DRAWABLESKEL_H
 
+
+#include "iostream"
+#include "fstream"
 #include "common/trischar.h"
 #include "viewer/interfaces/drawable_object.h"
 #include "viewer/interfaces/drawable_mesh.h"
@@ -10,6 +13,7 @@
 #include "viewer/mainwindow.h"
 #include "skeleton/skeletoncreator.h"
 #include "trimesh/trimesh.h"
+#include <algorithm>
 
 class DrawableSkel : public DrawableMesh,
                      public Trimesh<double>
@@ -59,7 +63,11 @@ class DrawableSkel : public DrawableMesh,
         bool deleteTriangle(int tid);
         int minDistanceBetweenThreePoints(Pointd a, Pointd b, Pointd c);
         bool hasTidThisTwoVertexes(int tid, Pointd a, Pointd b);
-        bool deleteVTX(int vid);
+        bool deleteVTX(int vid, int vid0);
+        bool updateDeletedTriNeighbours(int tid, int NeighTid);
+
+   private:
+       std::ofstream logPietro;
 
 
 };

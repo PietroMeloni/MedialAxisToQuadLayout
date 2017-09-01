@@ -1,7 +1,8 @@
 #ifndef SKELETONCREATOR_H
 #define SKELETONCREATOR_H
 
-
+#include "iostream"
+#include "fstream"
 #include "common/point.h"
 #include <QDebug>
 #include <CGAL/Simple_cartesian.h>
@@ -14,7 +15,7 @@
 #include "common/trischar.h"
 
 
-
+//using namespace std;
 typedef CGAL::Simple_cartesian<double>                           Kernel;
 typedef Kernel::Point_3                                          CgalPoint;
 typedef CGAL::Polyhedron_3<Kernel>                               Polyhedron3;
@@ -67,6 +68,7 @@ private:
         std::vector<double> listaPunti;
         double surfaceArea;
         static double getTriangleArea(Pointd a, Pointd b, Pointd c);
+        //ofstream log;
 
 };
 
