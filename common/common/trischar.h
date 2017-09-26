@@ -10,6 +10,8 @@ public:
     trisCharacteristic();
     static double getTriangleArea(Pointd a, Pointd b, Pointd c);
     static double getTriangleMinAngle(Pointd a, Pointd b, Pointd c);
+    static bool isAreaLessThan(Pointd a, Pointd b, Pointd c, double threshold);
+    static int minDistanceBetweenThreePoints(Pointd a, Pointd b, Pointd c);
 };
 
 

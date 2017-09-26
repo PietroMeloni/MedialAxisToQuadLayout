@@ -7,14 +7,14 @@ MODULES +=  TRIMESH
 
 HEADERS += \
     $$PWD/trimesh/trimesh.h \
-    $$PWD/trimesh/load_save_trimesh.h \
+    $$PWD/trimesh/load_save_trimesh.h
     #$$PWD/skel.h \
     #$$PWD/drawableskel.h \
     #$$PWD/cgalskeletoninterface.h \
     #$$PWD/skelmanager.h
 
 SOURCES += \
-    $$PWD/trimesh/load_save_trimesh.cpp \
+    $$PWD/trimesh/load_save_trimesh.cpp
     #$$PWD/skel.cpp \
     #$$PWD/drawableskel.cpp \
     #$$PWD/cgalskeletoninterface.cpp \

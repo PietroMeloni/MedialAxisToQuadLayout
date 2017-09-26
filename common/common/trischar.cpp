@@ -40,6 +40,64 @@ double trisCharacteristic::getTriangleMinAngle(Pointd a, Pointd b, Pointd c)
     return min;
 }
 
+bool trisCharacteristic::isAreaLessThan(Pointd a, Pointd b, Pointd c, double threshold)
+{
+    double soglia = threshold ;
+
+
+    double area = getTriangleArea(a,b,c);
+
+
+    if(area < soglia)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/**
+ * @brief DrawableSkel::minDistanceBetweenThreePoints calculate minimum distance between points
+ * @param a
+ * @param b
+ * @param c
+ * @return 0 if the edge is first-second, 1 if it is first third, -1 if it is second third
+ */
+int trisCharacteristic::minDistanceBetweenThreePoints(Pointd a, Pointd b, Pointd c)
+{
+    double distanceAB = a.dist(b);
+    double distanceAC = a.dist(c);
+    double distanceBC = b.dist(c);
+
+    if(distanceAB < distanceAC)
+    {
+        if(distanceAB < distanceBC)
+        {
+            return 0;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    else
+    {
+        if(distanceAC < distanceBC)
+        {
+            return 1;
+
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+
+}
+
 double trisCharacteristic::getTriangleArea(Pointd a, Pointd b, Pointd c)
 {
     Pointd v1 = b - a;

@@ -25,7 +25,7 @@ DrawableSkel::DrawableSkel(const char *file_name, int compr, double trashold)
     init();
     SkeletonCreator skelCreator(file_name, compr);
 
-    logPietro.open("/home/pietro/Desktop/log.txt");
+    logPietro.open(pathToDesktop);
     logPietro << "Entering Constructor: \n\n";
     triTrashold = trashold;
     edge_list = skelCreator.getListaEdge();
@@ -79,14 +79,14 @@ void DrawableSkel::compressSkeletonUntilConverge()
                            Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
                            15))
         {
-            logPietro.open("/home/pietro/Desktop/log.txt", std::fstream::app);
+            logPietro.open(pathToDesktop, std::fstream::app);
             logPietro << "tid = " + std::to_string(tid)+ " is on border\n";
             logPietro.close();
             mergeTwoVertexes(tid);
             shiftTriangleList();
             //buildAdjacency();
             tid--;
-            logPietro.open("/home/pietro/Desktop/log.txt", std::fstream::app);
+            logPietro.open(pathToDesktop, std::fstream::app);
             logPietro << "\n\n\n";
             logPietro.close();
 
@@ -350,7 +350,7 @@ bool DrawableSkel::mergeTwoVertexes(int tid)
                     if(hasTidThisTwoVertexes(tid_ptr0/3, vA, vB))
                     {
 
-                        logPietro.open("/home/pietro/Desktop/log.txt", std::fstream::app);
+                        logPietro.open(pathToDesktop, std::fstream::app);
                         logPietro << std::to_string((tri2tri[tid])[i])+" will be deleted with tid="+std::to_string(tid)+"\n";
                         logPietro.close();
                         deleteVTX(vid0, vid1);
@@ -368,7 +368,7 @@ bool DrawableSkel::mergeTwoVertexes(int tid)
                    {
                        if(hasTidThisTwoVertexes(tid_ptr0/3, vA, vC))
                        {
-                           logPietro.open("/home/pietro/Desktop/log.txt", std::fstream::app);
+                           logPietro.open(pathToDesktop, std::fstream::app);
                            logPietro << std::to_string((tri2tri[tid])[i])+" will be deleted with tid="+std::to_string(tid)+"\n";
                            logPietro.close();
                            deleteVTX(vid0, vid2);
@@ -384,7 +384,7 @@ bool DrawableSkel::mergeTwoVertexes(int tid)
                        //secondo e terzo
                        if(hasTidThisTwoVertexes(tid_ptr0/3, vB, vC))
                        {
-                           logPietro.open("/home/pietro/Desktop/log.txt", std::fstream::app);
+                           logPietro.open(pathToDesktop, std::fstream::app);
                            logPietro << std::to_string((tri2tri[tid])[i])+" will be deleted with tid="+std::to_string(tid)+"\n";
                            logPietro.close();
                            deleteVTX(vid2, vid1);
@@ -430,7 +430,7 @@ bool DrawableSkel::mergeTwoVertexes(int tid)
  */
 bool DrawableSkel::shiftTriangleList()
 {
-    logPietro.open("/home/pietro/Desktop/log.txt", std::fstream::app);
+    logPietro.open(pathToDesktop, std::fstream::app);
     //non c'è bisogno di controllare gli indici. Il ciclo si ferma se crescono troppo
     for(int tid = 0; tid < tris.size()/3; tid++)
     {
@@ -576,7 +576,7 @@ bool DrawableSkel::shiftTriangleList(int tid)
 
 bool DrawableSkel::deleteTriangle(int tid)
 {
-    logPietro.open("/home/pietro/Desktop/log.txt", std::fstream::app);
+    logPietro.open(pathToDesktop, std::fstream::app);
     logPietro << std::to_string(tid)+" set to TID_ELIM in tris\n";
     logPietro.close();
     int tid_ptr  = 3 * tid;
@@ -716,7 +716,7 @@ bool DrawableSkel::deleteVTX(int vid, int vid0)
     int tid;
     int tid_ptr;
     int lastVTX = numVertices()-1;
-    logPietro.open("/home/pietro/Desktop/log.txt", std::fstream::app);
+    logPietro.open(pathToDesktop, std::fstream::app);
     logPietro << "Now vid="+ std::to_string(vid) + " will be merged with vid0= "+std::to_string(vid0)+". vid0 will replace vid\n";
     //se il vertice che sto cercando di mergiare è l'ultimo della lista,
     //devo preoccuparmi solo dei suoi vicini
@@ -856,7 +856,7 @@ bool DrawableSkel::updateDeletedTriNeighbours(int tid, int NeighTid)
     int neighbour2;
     bool found = false;
 
-    logPietro.open("/home/pietro/Desktop/log.txt", std::fstream::app);
+    logPietro.open(pathToDesktop, std::fstream::app);
     logPietro << "Now neighs of tid="+ std::to_string(tid) +
            " and neighTID= "+std::to_string(NeighTid)+" will be updated\n";
 

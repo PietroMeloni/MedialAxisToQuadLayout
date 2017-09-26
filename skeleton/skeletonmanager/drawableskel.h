@@ -68,6 +68,7 @@ class DrawableSkel : public DrawableMesh,
 
    private:
        std::ofstream logPietro;
+       std::string pathToDesktop = "/home/pietro/Desktop/log.txt";
 
 
 };
