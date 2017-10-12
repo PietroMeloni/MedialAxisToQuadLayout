@@ -14,6 +14,7 @@
 #include "skeleton/skeletoncreator.h"
 #include "trimesh/trimesh.h"
 #include <algorithm>
+#include "skeleton/compacttrisonboarders.h"
 
 class DrawableSkel : public DrawableMesh,
                      public Trimesh<double>

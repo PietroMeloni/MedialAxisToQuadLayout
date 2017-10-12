@@ -59,40 +59,41 @@ void DrawableSkel::init()
 
 void DrawableSkel::compressSkeletonUntilConverge()
 {
+    buildAdjacency();
+    CompactTrisOnBoarders compacter(tris, coords, triTrashold, tri2tri, vtx2tri );
+//    for(int tid=0; tid< tris.size()/3; ++tid)
+//    {
+//        int tid_ptr  = 3 * tid;
+//        int vid0     = tris[tid_ptr + 0];
+//        int vid1     = tris[tid_ptr + 1];
+//        int vid2     = tris[tid_ptr + 2];
+//        int vid0_ptr = 3 * vid0;
+//        int vid1_ptr = 3 * vid1;
+//        int vid2_ptr = 3 * vid2;
 
-    for(int tid=0; tid< tris.size()/3; ++tid)
-    {
-        int tid_ptr  = 3 * tid;
-        int vid0     = tris[tid_ptr + 0];
-        int vid1     = tris[tid_ptr + 1];
-        int vid2     = tris[tid_ptr + 2];
-        int vid0_ptr = 3 * vid0;
-        int vid1_ptr = 3 * vid1;
-        int vid2_ptr = 3 * vid2;
+//        if(isTrisOnBorder2(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
+//                          Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
+//                          Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
+//                          triTrashold)||
+//           isTrisOnBorder(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
+//                           Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
+//                           Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
+//                           15))
+//        {
+//            logPietro.open(pathToDesktop, std::fstream::app);
+//            logPietro << "tid = " + std::to_string(tid)+ " is on border\n";
+//            logPietro.close();
+//            mergeTwoVertexes(tid);
+//            shiftTriangleList();
+//            //buildAdjacency();
+//            tid--;
+//            logPietro.open(pathToDesktop, std::fstream::app);
+//            logPietro << "\n\n\n";
+//            logPietro.close();
 
-        if(isTrisOnBorder2(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
-                          Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
-                          Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
-                          triTrashold)||
-           isTrisOnBorder(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
-                           Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
-                           Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
-                           15))
-        {
-            logPietro.open(pathToDesktop, std::fstream::app);
-            logPietro << "tid = " + std::to_string(tid)+ " is on border\n";
-            logPietro.close();
-            mergeTwoVertexes(tid);
-            shiftTriangleList();
-            //buildAdjacency();
-            tid--;
-            logPietro.open(pathToDesktop, std::fstream::app);
-            logPietro << "\n\n\n";
-            logPietro.close();
+//        }
 
-        }
-
-    }
+//    }
 }
 
 double DrawableSkel::sceneRadius() const
@@ -114,9 +115,9 @@ void DrawableSkel::draw() const
     glDepthRange(0.01, 1.0);
     bool haveNeighborsSmallArea = true;
 
-    for(std::pair<Pointd, Pointd> pair : edge_list)
-    {
-
+//    for(std::pair<Pointd, Pointd> pair : edge_list)
+//    {
+//
 //        if(!temp.contains(pair.first))
 //        {
 //            drawSphere(pair.first,0.005,QColor(0,255,0,127));
@@ -127,11 +128,12 @@ void DrawableSkel::draw() const
 //            drawSphere(pair.second,0.005,QColor(0,255,0,127));
 //            temp.push_back(pair.second);
 //        }
-        drawLine(pair.first, pair.second, QColor(127,127,127,127));
-    }
+//        drawLine(pair.first, pair.second, QColor(127,127,127,127));
+//    }
 
     int n_tris = tris.size()/3;
-    for(int tid=0; tid<n_tris; ++tid) {
+    for(int tid=0; tid<n_tris; ++tid)
+    {
         int tid_ptr  = 3 * tid;
         int vid0     = tris[tid_ptr + 0];
         int vid1     = tris[tid_ptr + 1];
@@ -140,16 +142,12 @@ void DrawableSkel::draw() const
         int vid1_ptr = 3 * vid1;
         int vid2_ptr = 3 * vid2;
         int j=0;
+        Pointd a(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]);
+        Pointd b(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]);
+        Pointd c(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]);
 
         haveNeighborsSmallArea = true;
-        if(isTrisOnBorder2(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
-                          Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
-                          Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
-                          triTrashold)||
-           isTrisOnBorder(Pointd(coords[vid0_ptr],coords[vid0_ptr+1],coords[vid0_ptr+2]),
-                          Pointd(coords[vid1_ptr],coords[vid1_ptr+1],coords[vid1_ptr+2]),
-                          Pointd(coords[vid2_ptr],coords[vid2_ptr+1],coords[vid2_ptr+2]),
-                          15))
+        if(isTrisOnBorder2(a,b,c,triTrashold))
         {
 
             //controllo se i vicini hanno area piccola anche loro tramite
@@ -217,6 +215,10 @@ void DrawableSkel::draw() const
         glNormal3dv(&(triangleNormals[tid_ptr]));
         glVertex3dv(&(coords[vid2_ptr]));
         glEnd();
+
+        drawLine(a,b,QColor(0,0,0,127));
+        drawLine(a,c,QColor(0,0,0,127));
+        drawLine(c,b,QColor(0,0,0,127));
     }
       //drawSphere(edge_list->front().first,1,QColor(0,255,0,127),20);
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -625,6 +627,7 @@ int DrawableSkel::minDistanceBetweenThreePoints(Pointd a, Pointd b, Pointd c)
 
 
 }
+
 /**
  * @brief DrawableSkel::hasTidThisTwoVertexes
  * @param tid

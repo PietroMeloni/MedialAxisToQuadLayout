@@ -98,13 +98,84 @@ int trisCharacteristic::minDistanceBetweenThreePoints(Pointd a, Pointd b, Pointd
 
 }
 
-double trisCharacteristic::getTriangleArea(Pointd a, Pointd b, Pointd c)
+/**
+ * @brief hasTidThisTwoVertexes
+ * @param tA vertex of triangle to be checked
+ * @param tB vertex of triangle to be checked
+ * @param tC vertex of triangle to be checked
+ * @param a  check if is in triangle
+ * @param b  check if is in triangle
+ * @return true se tid ha a e b come vertici, false altrimenti.
+ */
+bool trisCharacteristic::hasTidThisTwoVertexes(Pointd a, Pointd b, Pointd tA, Pointd tB, Pointd tC)
+{
+
+    if(tA == a)
+    {
+        if(tB == b || tC == b)
+        {
+            return true;
+
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if(tA == b)
+        {
+            if(tB == a || tC == a)
+            {
+                return true;
+
+            }
+            else
+            {
+                return false;
+            }
+        }
+        if(tB == a)
+        {
+            if(tC == b)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if(tB == b)
+            {
+                if(tC == a)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+}
+
+long double trisCharacteristic::getTriangleArea(Pointd a, Pointd b, Pointd c)
 {
     Pointd v1 = b - a;
     Pointd v2 = c - a;
 
     Pointd cross = v1.cross(v2);
-    double area = cross.getLength()/2;
+    long double area = cross.getLength()/2;
 
     return area;
 }
