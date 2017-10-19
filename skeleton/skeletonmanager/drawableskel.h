@@ -7,14 +7,17 @@
 #include "common/trischar.h"
 #include "viewer/interfaces/drawable_object.h"
 #include "viewer/interfaces/drawable_mesh.h"
-#include "skel.h"
 #include "viewer/objects/objects.h"
-#include <QColor>
 #include "viewer/mainwindow.h"
+#include "skel.h"
+
+#include <QColor>
+#include "skeleton/compacttrisonboarders.h"
 #include "skeleton/skeletoncreator.h"
 #include "trimesh/trimesh.h"
+#include "trimesh/load_save_trimesh.h"
 #include <algorithm>
-#include "skeleton/compacttrisonboarders.h"
+
 
 class DrawableSkel : public DrawableMesh,
                      public Trimesh<double>

@@ -14,7 +14,7 @@ CompactTrisOnBoarders::CompactTrisOnBoarders(std::vector<int>& tris, std::vector
 
 }
 /**
- * @brief CompactTrisOnBoarders::fillSets
+ * @brief CompactTrisOnBoarders::fillSets fills sets containing tri and vtx to be deleted
  * @param tris
  * @param coords
  * @param threshold
@@ -52,6 +52,7 @@ void CompactTrisOnBoarders::fillSets(std::vector<int>& tris, std::vector<double>
             //this int is an indicator of whitch edge is the smaller in the current tri
             int minorEdge = trisCharacteristic::minDistanceBetweenThreePoints(a,b,c);
 
+            //setting vtx in a way that can be used like pointd and like int
             if(minorEdge == 0)
             {
                 firstVtxSE = a;
@@ -97,7 +98,7 @@ void CompactTrisOnBoarders::fillSets(std::vector<int>& tris, std::vector<double>
                     found = true;
                     //sapendo che il vicino con il lato più corto
                     //è il vicino i-esimo,  gli altri due devono essere
-                    //per forza quelli che divantano vicini tra loro
+                    //per forza quelli che diventano vicini tra loro
                     int neighT1 = (tri2tri[tid])[(i+1)%3];
                     int neighT2 = (tri2tri[tid])[(i+2)%3];
 
@@ -159,7 +160,15 @@ void CompactTrisOnBoarders::fillSets(std::vector<int>& tris, std::vector<double>
     deleteTrisFromList( tris );
 
 }
-
+/**
+ * @brief CompactTrisOnBoarders::buildNewCoordAdj mantains congruent list of cords and neigh of vtx
+ * @param firstVTX
+ * @param secondVTX
+ * @param tid
+ * @param neigh
+ * @param tris
+ * @param coords
+ */
 void CompactTrisOnBoarders::buildNewCoordAdj(int firstVTX, int secondVTX, int tid, int neigh, std::vector<int>& tris, std::vector<double>& coords)
 {
     int num_changes_loop = 0;
@@ -167,15 +176,25 @@ void CompactTrisOnBoarders::buildNewCoordAdj(int firstVTX, int secondVTX, int ti
     {
         int triN = (vtx2tri[firstVTX])[i];
         int triN_ptr = triN*3;
-
-        for(int j=0; j < 3; j++)
+        if(triN != tid && triN != neigh)
         {
-            if(tris[triN_ptr+j] == firstVTX)
+            for(int j=0; j < 3; j++)
             {
-                tris[triN_ptr+j] = secondVTX;
-                num_changes_loop++;
+                if(tris[triN_ptr+j] == firstVTX)
+                {
+                    tris[triN_ptr+j] = secondVTX;
+                    num_changes_loop++;
 
+                }
             }
+        }
+        //check for errors
+        if(triN != tid && triN != neigh && (tris[triN_ptr] == tris[triN_ptr+1] ||
+           (tris[triN_ptr+1] == tris[triN_ptr+2]) || (tris[triN_ptr] == tris[triN_ptr+2]))&&
+            std::find(alreadyCompactedTris.begin(), alreadyCompactedTris.end(), triN) == alreadyCompactedTris.end() )
+        {
+            alreadyCompactedTris.sort();
+            qDebug() << "triN = " <<triN << "has 2 or more vtx equal";
         }
     }
 
@@ -220,6 +239,18 @@ void CompactTrisOnBoarders::deleteTrisFromList(std::vector<int> &tris)
         /*tris.erase();
         tris.erase(std::remove(tris.begin(), tris.end(), tid*3), tris.end());*/
 
+    }
+    int a,b,c;
+    for(int i = 0; i < tris.size(); i+=3)
+    {
+        a = tris[i];
+        b = tris[i+1];
+        c = tris[i+2];
+        if(a == b || a == c || b == c)
+        {
+            tris.erase(tris.begin()+i, tris.begin()+i+3);
+            i-=3;
+        }
     }
 }
 
