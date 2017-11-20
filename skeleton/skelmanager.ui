@@ -78,6 +78,32 @@
     <string>deleteDTri</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="butTESTDeleteDTri">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>190</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TESTDelete</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="butTESTNewIteration">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>newIteration</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

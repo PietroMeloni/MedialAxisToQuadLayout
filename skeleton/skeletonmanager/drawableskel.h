@@ -30,6 +30,7 @@ class DrawableSkel : public DrawableMesh,
         DrawableSkel();
         DrawableSkel(const char* file_name);
         DrawableSkel(const char* file_name, int compressions, double trashold);
+        DrawableSkel(const char* file_name, int compressions, double trashold, int test_Value);
         DrawableSkel(const Skel *skel);
 
         ~DrawableSkel();
@@ -42,6 +43,7 @@ class DrawableSkel : public DrawableMesh,
         bool isVisible() const;
         void init();
         void compressSkeletonUntilConverge();
+        void compressSkeletonUntilConverge(int numTris2BeDeleted);
 
 
 

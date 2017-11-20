@@ -32,7 +32,16 @@ DrawableSkel::DrawableSkel(const char *file_name, int compr, double trashold)
     buildAdjacency();
     updateNormals();
     updateBbox();
+    saveObj("//home//pietro//Desktop//meshCompattataSenzaDel.obj",coords,tris);
 
+}
+
+DrawableSkel::DrawableSkel(const char *file_name, int compressions, double trashold, int test_Value)
+{
+    loadObj(file_name, coords, tris);
+    buildAdjacency();
+    updateNormals();
+    updateBbox();
 }
 
 DrawableSkel::DrawableSkel(const Skel *skel)
@@ -63,6 +72,14 @@ void DrawableSkel::compressSkeletonUntilConverge()
     saveObj("//home//pietro//Desktop//meshCompattata.obj",coords,tris);
 
 
+}
+
+void DrawableSkel::compressSkeletonUntilConverge(int numTris2BeDeleted)
+{
+    buildAdjacency();
+    CompactTrisOnBoarders compacter(tris, coords, triTrashold, tri2tri, vtx2tri, numTris2BeDeleted);
+    buildAdjacency();
+    //saveObj("//home//pietro//Desktop//meshCompattata.obj",coords,tris);
 }
 
 double DrawableSkel::sceneRadius() const

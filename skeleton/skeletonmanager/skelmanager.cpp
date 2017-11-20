@@ -139,3 +139,32 @@ void SkeletonManager::on_butDeleteDTri_clicked()
         }
     }
 }
+
+void SkeletonManager::on_butTESTDeleteDTri_clicked()
+{
+    QString compressions = ui->lineNumCompr->text();
+    QString trHo = ui->lineAngleTH->text();
+    double th = trHo.toDouble();
+    //qDebug() <<th;
+    int compr = compressions.toInt();
+    QString path1 = QFileDialog::getOpenFileName(mainWindow,
+                                                   "Open Trimesh",
+                                                   ".",
+                                                   "OBJ(*.obj)");
+    dsk = new DrawableSkel(path1.toStdString().c_str(), compr, th,0);
+    dsk->compressSkeletonUntilConverge(1);
+    mainWindow->pushObj(dsk, "Skeleton");
+    setButtonsSkelLoaded(true);
+    mainWindow->updateGlCanvas();
+
+
+
+
+}
+
+void SkeletonManager::on_butTESTNewIteration_clicked()
+{
+
+    dsk->compressSkeletonUntilConverge(1);
+    mainWindow->updateGlCanvas();
+}
